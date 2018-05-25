@@ -25,6 +25,8 @@ public class SwipeManager : MonoBehaviour {
 	*/
 	Vector2 touchEnd;
 
+    int swipeType;
+
 	void Start () {
 		moveDir = Vector2.zero;
 		playerMovement = GetComponent<PlayerMovement> ();
@@ -37,25 +39,21 @@ public class SwipeManager : MonoBehaviour {
 	void Update () {
 		if (Input.touchCount > 0) {
 			int id = Input.GetTouch (0).fingerId;
-			if (!EventSystem.current.IsPointerOverGameObject (id)) {
-				Touch touch = Input.GetTouch (0);
-				switch (touch.phase) {
-				case TouchPhase.Began:
-					playerMovement.StopMoving ();
-					touchStart = touch.position;
-					moveDir = Vector2.zero;
-					break;
-				case TouchPhase.Moved:
-					moveDir = touch.position - touchStart;
-					touchStart = touch.position;
-					MoveInDirection (moveDir);
-					break;
-				/*case TouchPhase.Ended:
-					moveDir = Vector2.zero;
-					playerMovement.StopMoving ();
-					break;*/
-				}
-			}
+            Touch touch = Input.GetTouch(0);
+            if (!EventSystem.current.IsPointerOverGameObject(id)) {
+                switch (touch.phase) {
+                    case TouchPhase.Began:
+                        playerMovement.StopMoving();
+                        touchStart = touch.position;
+                        moveDir = Vector2.zero;
+                        break;
+                    case TouchPhase.Moved:
+                        moveDir = touch.position - touchStart;
+                        touchStart = touch.position;
+                        MoveInDirection(moveDir);
+                        break;
+                }
+            }
 		}
 	}
 

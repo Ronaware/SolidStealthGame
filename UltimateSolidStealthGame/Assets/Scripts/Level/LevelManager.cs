@@ -21,7 +21,7 @@ public class LevelManager : MonoBehaviour {
 		get { return LevelName; }
 	}
 
-	void Start () {
+	void Awake () {
 		manager = GameObject.FindGameObjectWithTag ("Player").GetComponent<PlayerManager> ();
 		foreach (GameObject e in equipmentForLevel) {
 			manager.WeaponSystem.AddEquipment (e);
