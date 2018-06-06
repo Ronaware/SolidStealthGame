@@ -272,6 +272,24 @@
     <Reference Include="SyntaxTree.VisualStudio.Unity.Bridge">
       <HintPath>C:/Program Files (x86)/Microsoft Visual Studio Tools for Unity/15.0/Editor/SyntaxTree.VisualStudio.Unity.Bridge.dll</HintPath>
     </Reference>
+    <Reference Include="ProBuilderCore-Unity5">
+      <HintPath>Assets/ProCore/ProBuilder/Classes/ProBuilderCore-Unity5.dll</HintPath>
+    </Reference>
+    <Reference Include="ProBuilderMeshOps-Unity5">
+      <HintPath>Assets/ProCore/ProBuilder/Classes/ProBuilderMeshOps-Unity5.dll</HintPath>
+    </Reference>
+    <Reference Include="KdTreeLib">
+      <HintPath>Assets/ProCore/ProBuilder/Classes/ClassesLib/KdTreeLib.dll</HintPath>
+    </Reference>
+    <Reference Include="pb_Stl">
+      <HintPath>Assets/ProCore/ProBuilder/Classes/ClassesLib/pb_Stl.dll</HintPath>
+    </Reference>
+    <Reference Include="Poly2Tri">
+      <HintPath>Assets/ProCore/ProBuilder/Classes/ClassesLib/Poly2Tri.dll</HintPath>
+    </Reference>
+    <Reference Include="ProBuilderEditor-Unity5">
+      <HintPath>Assets/ProCore/ProBuilder/Editor/ProBuilderEditor-Unity5.dll</HintPath>
+    </Reference>
     <Reference Include="UnityEngine.Advertisements">
       <HintPath>C:/Users/Natha/AppData/LocalLow/Unity/cache/packages/packages.unity.com/com.unity.ads@2.0.3/UnityEngine.Advertisements.dll</HintPath>
     </Reference>
@@ -292,24 +310,6 @@
     </Reference>
     <Reference Include="UnityEngine.StandardEvents">
       <HintPath>C:/Users/Natha/AppData/LocalLow/Unity/cache/packages/packages.unity.com/com.unity.standardevents@1.0.10/UnityEngine.StandardEvents.dll</HintPath>
-    </Reference>
-    <Reference Include="ProBuilderCore-Unity5">
-      <HintPath>Assets/ProCore/ProBuilder/Classes/ProBuilderCore-Unity5.dll</HintPath>
-    </Reference>
-    <Reference Include="pb_Stl">
-      <HintPath>Assets/ProCore/ProBuilder/Classes/ClassesLib/pb_Stl.dll</HintPath>
-    </Reference>
-    <Reference Include="Poly2Tri">
-      <HintPath>Assets/ProCore/ProBuilder/Classes/ClassesLib/Poly2Tri.dll</HintPath>
-    </Reference>
-    <Reference Include="ProBuilderEditor-Unity5">
-      <HintPath>Assets/ProCore/ProBuilder/Editor/ProBuilderEditor-Unity5.dll</HintPath>
-    </Reference>
-    <Reference Include="ProBuilderMeshOps-Unity5">
-      <HintPath>Assets/ProCore/ProBuilder/Classes/ProBuilderMeshOps-Unity5.dll</HintPath>
-    </Reference>
-    <Reference Include="KdTreeLib">
-      <HintPath>Assets/ProCore/ProBuilder/Classes/ClassesLib/KdTreeLib.dll</HintPath>
     </Reference>
     <Reference Include="UnityEditor.iOS.Extensions.Xcode">
       <HintPath>C:/Program Files/Unity/Editor/Data/PlaybackEngines/iOSSupport\UnityEditor.iOS.Extensions.Xcode.dll</HintPath>
@@ -337,47 +337,20 @@
     <Compile Include="Assets\SampleScenes\Menu\Scripts\SceneAndURLLoader.cs" />
     <Compile Include="Assets\SampleScenes\Scripts\CameraSwitch.cs" />
     <Compile Include="Assets\SampleScenes\Scripts\LevelReset.cs" />
-    <Compile Include="Assets\SampleScenes\Scripts\ParticleSceneControls.cs" />
     <Compile Include="Assets\SampleScenes\Scripts\PlaceTargetWithMouse.cs" />
     <Compile Include="Assets\SampleScenes\Scripts\SlowMoButton.cs" />
-    <Compile Include="Assets\Scripts\Characters\CharacterManager.cs" />
-    <Compile Include="Assets\Scripts\Characters\Enemy\BotSight.cs" />
-    <Compile Include="Assets\Scripts\Characters\Enemy\EnemyDistraction.cs" />
-    <Compile Include="Assets\Scripts\Characters\Enemy\EnemyManager.cs" />
-    <Compile Include="Assets\Scripts\Characters\Enemy\EnemyMovement.cs" />
-    <Compile Include="Assets\Scripts\Characters\Enemy\EnemySight.cs" />
-    <Compile Include="Assets\Scripts\Characters\Enemy\EnemySightPlane.cs" />
-    <Compile Include="Assets\Scripts\Characters\Enemy\EnemyWeaponSystem.cs" />
-    <Compile Include="Assets\Scripts\Characters\Enemy\LaserDistraction.cs" />
-    <Compile Include="Assets\Scripts\Characters\Enemy\SmokeDistraction.cs" />
-    <Compile Include="Assets\Scripts\Characters\Enemy\SoldierSight.cs" />
-    <Compile Include="Assets\Scripts\Characters\HealthManager.cs" />
-    <Compile Include="Assets\Scripts\Characters\Player\FollowCamera.cs" />
-    <Compile Include="Assets\Scripts\Characters\Player\PlayerManager.cs" />
-    <Compile Include="Assets\Scripts\Characters\Player\PlayerMovement.cs" />
-    <Compile Include="Assets\Scripts\Characters\Player\PlayerWeaponSystem.cs" />
-    <Compile Include="Assets\Scripts\Characters\Player\SwipeManager.cs" />
     <Compile Include="Assets\Scripts\Debug\GraphDebugger.cs" />
     <Compile Include="Assets\Scripts\Debug\VertexDisplay.cs" />
     <Compile Include="Assets\Scripts\Enums.cs" />
     <Compile Include="Assets\Scripts\Grid\Graph.cs" />
+    <Compile Include="Assets\Scripts\Grid\GridDisplay.cs" />
+    <Compile Include="Assets\Scripts\Grid\SnakeGraph.cs" />
     <Compile Include="Assets\Scripts\Grid\Vertex.cs" />
-    <Compile Include="Assets\Scripts\Level\EndLevelZone.cs" />
-    <Compile Include="Assets\Scripts\Level\LevelManager.cs" />
     <Compile Include="Assets\Scripts\MouseCameraController.cs" />
     <Compile Include="Assets\Scripts\MovingEnemyPatrol.cs" />
     <Compile Include="Assets\Scripts\PatrolWaypoint.cs" />
     <Compile Include="Assets\Scripts\PlayerController.cs" />
     <Compile Include="Assets\Scripts\TopDownCamCtrl.cs" />
-    <Compile Include="Assets\Scripts\Weapons\Bullet.cs" />
-    <Compile Include="Assets\Scripts\Weapons\Cigarette.cs" />
-    <Compile Include="Assets\Scripts\Weapons\CigarettePack.cs" />
-    <Compile Include="Assets\Scripts\Weapons\Equipment.cs" />
-    <Compile Include="Assets\Scripts\Weapons\Gun.cs" />
-    <Compile Include="Assets\Scripts\Weapons\IceMachine.cs" />
-    <Compile Include="Assets\Scripts\Weapons\Knife.cs" />
-    <Compile Include="Assets\Scripts\Weapons\LaserPointer.cs" />
-    <Compile Include="Assets\Scripts\Weapons\LaserTarget.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\ProCore\ProBuilder\API Examples\Icosphere FFT\README.txt" />
