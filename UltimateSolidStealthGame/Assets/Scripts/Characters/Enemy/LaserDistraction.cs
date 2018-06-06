@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -26,11 +27,15 @@ public class LaserDistraction : EnemyDistraction {
 	protected override void CheckForDistraction () {
 		Collider[] hits = Physics.OverlapSphere (transform.position, checkRadius, distractionLayers, QueryTriggerInteraction.Collide);
 		foreach (Collider hit in hits) {
-			if (!Physics.Linecast (transform.position, hit.transform.position, manager.Sight.IgnoreEnemiesLayer, QueryTriggerInteraction.Ignore)) {
+			if (!Physics.Linecast (transform.position, hit.transform.position, manager.Sight.SightLayer, QueryTriggerInteraction.Ignore)) {
 				LaserTarget target = hit.GetComponent<LaserTarget> ();
 				if (target) {
 					GameObject obj = hit.gameObject;
-					SetDistraction (target.Location, ref obj);
+                    if (manager.IsBoss) {
+                        SetDistraction(target.Vertex.parentVertex.index, ref obj);
+                    } else {
+                        SetDistraction(target.Vertex.index, ref obj);
+                    }
 				}
 			}
 		}
@@ -42,14 +47,21 @@ public class LaserDistraction : EnemyDistraction {
 
 	protected override IEnumerator AtDistraction () {
 		manager.Movement.Turn(distraction.transform.forward);
+        isAtDistraction = true;
 		//laser animation
 		Destroy(distraction);
 		yield return new WaitForSeconds (distractionTime);
-		distracted = false;
-		enabled = true;
-		manager.Movement.enabled = true;
-		if (manager.Sight) manager.Sight.enabled = true;
-		if (manager.WeaponSystem) manager.WeaponSystem.enabled = true;
-		pathToDistraction.Clear ();
+        ResetDistraction();
 	}
+
+    public override void ResetDistraction() {
+        isAtDistraction = false;
+        StopAllCoroutines();
+        if (manager.Movement) manager.Movement.enabled = true;
+        if (manager.Sight) manager.Sight.enabled = true;
+        if (manager.WeaponSystem) manager.WeaponSystem.enabled = true;
+        enabled = true;
+        distracted = false;
+        pathToDistraction.Clear();
+    }
 }

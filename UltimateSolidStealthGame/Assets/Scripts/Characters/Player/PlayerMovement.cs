@@ -43,6 +43,7 @@ public class PlayerMovement : MonoBehaviour {
 		reference to NavMeshAgent component
 	*/
 	UnityEngine.AI.NavMeshAgent nav;
+    AudioSource audioSource;
 
 	public int CurrVertexIndex {
 		get { return currVertexIndex; }
@@ -75,6 +76,8 @@ public class PlayerMovement : MonoBehaviour {
 		manager = GetComponent<PlayerManager> ();
 		moveAmount = manager.Graph.VertexDistance;
 		nav = GetComponent<UnityEngine.AI.NavMeshAgent> ();
+        audioSource = GetComponent<AudioSource>();
+        audioSource.loop = true;
 		currVertexIndex = manager.Graph.GetIndexFromPosition(transform.position);
 		lastVertexIndex = currVertexIndex;
 		playerName = gameObject.name;
@@ -107,6 +110,7 @@ public class PlayerMovement : MonoBehaviour {
 	void SetNewDestination() {
 		if (nav && manager && manager.Graph) {
 			if (nav.remainingDistance <= 0.1f) {
+                int nextVertex;
 				if (lastVertexIndex != currVertexIndex) {
 					if (manager.Graph.vertices[lastVertexIndex].occupiedBy == playerName) {
 						manager.Graph.vertices [lastVertexIndex].occupied = false;
@@ -121,55 +125,77 @@ public class PlayerMovement : MonoBehaviour {
 					transform.rotation = Quaternion.LookRotation(movement);
 					switch (direction) {
 					case Enums.directions.left:
-						if (manager.Graph.vertices [currVertexIndex - 1] != null) {
-							if (manager.Graph.vertices [currVertexIndex - 1].occupied == true) {
-								//StopMoving ();
-								return;
-							}
-							lastVertexIndex = currVertexIndex;
-							currVertexIndex -= 1;
-						} else {
-							StopMoving ();
-						}
+                        nextVertex = currVertexIndex - 1;
+                        if (nextVertex >= 0 && nextVertex < manager.Graph.GraphCount) {
+                            if (manager.Graph.vertices[currVertexIndex - 1] != null) {
+                                if (!audioSource.isPlaying) audioSource.Play();
+                                if (manager.Graph.vertices[currVertexIndex - 1].occupied == true) {
+                                    return;
+                                }
+                                lastVertexIndex = currVertexIndex;
+                                currVertexIndex -= 1;
+                            }
+                            else {
+                                StopMoving();
+                            }
+                        } else {
+                            return;
+                        }
 						break;
 					case Enums.directions.right:
-						if (manager.Graph.vertices [currVertexIndex + 1] != null) {
-							if (manager.Graph.vertices [currVertexIndex + 1].occupied == true) {
-								//StopMoving ();
-								return;
-							}
-							lastVertexIndex = currVertexIndex;
-							currVertexIndex += 1;
-						} else {
-							StopMoving ();
-						}
+                        nextVertex = currVertexIndex + 1;
+                        if (nextVertex >= 0 && nextVertex < manager.Graph.GraphCount) {
+                            if (manager.Graph.vertices[currVertexIndex + 1] != null) {
+                                if (!audioSource.isPlaying) audioSource.Play();
+                                if (manager.Graph.vertices[currVertexIndex + 1].occupied == true) {
+                                    return;
+                                }
+                                lastVertexIndex = currVertexIndex;
+                                currVertexIndex += 1;
+                            } else {
+                                StopMoving();
+                            }
+                        } else {
+                            return;
+                        }
 						break;
 					case Enums.directions.up:
-						if (manager.Graph.vertices [currVertexIndex + manager.Graph.GridWidth] != null) {
-							if (manager.Graph.vertices [currVertexIndex + manager.Graph.GridWidth].occupied == true) {
-								//StopMoving ();
-								return;
-							}
-							lastVertexIndex = currVertexIndex;
-							currVertexIndex += manager.Graph.GridWidth;
-						} else {
-							StopMoving ();
-						}
+                        nextVertex = currVertexIndex + manager.Graph.GridWidth;
+                        if (nextVertex >= 0 && nextVertex < manager.Graph.GraphCount) {
+                            if (!audioSource.isPlaying) audioSource.Play();
+                            if (manager.Graph.vertices[nextVertex] != null) {
+                                if (manager.Graph.vertices[nextVertex].occupied == true) {
+                                    return;
+                                }
+                                lastVertexIndex = currVertexIndex;
+                                currVertexIndex += manager.Graph.GridWidth;
+                            }
+                            else {
+                                StopMoving();
+                            }
+                        } else {
+                            return;
+                        }
 						break;
 					case Enums.directions.down:
-						if (manager.Graph.vertices [currVertexIndex - manager.Graph.GridWidth] != null) {
-							if (manager.Graph.vertices [currVertexIndex - manager.Graph.GridWidth].occupied == true) {
-								//StopMoving ();
-								return;
-							}
-							lastVertexIndex = currVertexIndex;
-							currVertexIndex -= manager.Graph.GridWidth;
-
-						} else {
-							StopMoving ();
-						}
-						break;
-					}
+                        nextVertex = currVertexIndex - manager.Graph.GridWidth;
+                        if (nextVertex >= 0 && nextVertex < manager.Graph.GraphCount) {
+                            if (manager.Graph.vertices[nextVertex] != null) {
+                                if (!audioSource.isPlaying) audioSource.Play();
+                                if (manager.Graph.vertices[nextVertex].occupied == true) {
+                                    return;
+                                }
+                                lastVertexIndex = currVertexIndex;
+                                currVertexIndex -= manager.Graph.GridWidth;
+                            }
+                            else {
+                                StopMoving();
+                            }
+                        } else {
+                            return;
+                        }
+                        break;
+                    }
 					manager.Graph.vertices [lastVertexIndex].occupied = true;
 					manager.Graph.vertices [lastVertexIndex].occupiedBy = playerName;
                     manager.Graph.vertices[lastVertexIndex].NotifyParentOrChild();
@@ -209,5 +235,6 @@ public class PlayerMovement : MonoBehaviour {
 	*/
 	public void StopMoving() {
 		movement = Vector3.zero;
-	}
+        if (audioSource.isPlaying) audioSource.Stop() ;
+    }
 }

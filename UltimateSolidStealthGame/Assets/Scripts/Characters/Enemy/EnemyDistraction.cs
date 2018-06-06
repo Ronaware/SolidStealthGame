@@ -44,6 +44,7 @@ public abstract class EnemyDistraction : MonoBehaviour {
 	 	layer that defines specific distraction objects
 	*/
 	protected int distractionLayers;
+    protected bool isAtDistraction;
 
     public GameObject Distraction {
         get { return distraction; }
@@ -55,6 +56,9 @@ public abstract class EnemyDistraction : MonoBehaviour {
 		get { return distracted; }
 		set { distracted = value; }
 	}
+    public bool IsAtDistraction {
+        get { return isAtDistraction; }
+    }
 
 	public virtual void Start() {
 		manager = GetComponent<EnemyManager> ();
@@ -81,6 +85,7 @@ public abstract class EnemyDistraction : MonoBehaviour {
 				}
 			} else if (!distraction) {
 				distracted = false;
+                isAtDistraction = false;
 				pathToDistraction.Clear ();
 				manager.Movement.BackToPatrol ();
 				return;
@@ -113,5 +118,7 @@ public abstract class EnemyDistraction : MonoBehaviour {
 	/*
 	 	coroutine that defines what enemy should do once they reach the distraction
 	*/
-	protected abstract IEnumerator AtDistraction () ;
+	protected abstract IEnumerator AtDistraction() ;
+
+    public abstract void ResetDistraction();
 }

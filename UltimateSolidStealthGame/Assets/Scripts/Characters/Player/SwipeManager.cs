@@ -9,10 +9,6 @@ using UnityEngine.EventSystems;
 public class SwipeManager : MonoBehaviour {
 
 	/*
-		reference to PlayerMovement component
-	*/
-	PlayerMovement playerMovement;
-	/*
 		direction player will move in
 	*/
 	Vector2 moveDir;
@@ -24,12 +20,13 @@ public class SwipeManager : MonoBehaviour {
 		location of touch end on screen
 	*/
 	Vector2 touchEnd;
+    PlayerManager manager;
 
     int swipeType;
 
 	void Start () {
 		moveDir = Vector2.zero;
-		playerMovement = GetComponent<PlayerMovement> ();
+        manager = GetComponent<PlayerManager>();
 	}
 
 	/*
@@ -37,24 +34,31 @@ public class SwipeManager : MonoBehaviour {
 		detects touches and swipes and moves player based on swipe direction
 	*/
 	void Update () {
-		if (Input.touchCount > 0) {
-			int id = Input.GetTouch (0).fingerId;
-            Touch touch = Input.GetTouch(0);
-            if (!EventSystem.current.IsPointerOverGameObject(id)) {
-                switch (touch.phase) {
-                    case TouchPhase.Began:
-                        playerMovement.StopMoving();
-                        touchStart = touch.position;
-                        moveDir = Vector2.zero;
-                        break;
-                    case TouchPhase.Moved:
-                        moveDir = touch.position - touchStart;
-                        touchStart = touch.position;
-                        MoveInDirection(moveDir);
-                        break;
+        if (Time.timeScale > 0.0f) {
+            if (Input.touchCount > 0) {
+                int id = Input.GetTouch(0).fingerId;
+                Touch touch = Input.GetTouch(0);
+                if (!EventSystem.current.IsPointerOverGameObject(id)) {
+                    switch (touch.phase) {
+                        case TouchPhase.Began:
+                            manager.Movement.StopMoving();
+                            touchStart = touch.position;
+                            moveDir = Vector2.zero;
+                            break;
+                        case TouchPhase.Moved:
+                            moveDir = touch.position - touchStart;
+                            touchStart = touch.position;
+                            MoveInDirection(moveDir);
+                            break;
+                        case TouchPhase.Ended:
+                            if (moveDir.magnitude < 5.0f) {
+                                manager.Interact.TryInteract();
+                            }
+                            break;
+                    }
                 }
             }
-		}
+        }
 	}
 
 	/*
@@ -62,20 +66,20 @@ public class SwipeManager : MonoBehaviour {
 		@param dir - direction of swipe
 	*/
 	void MoveInDirection(Vector2 dir) {
-		if (moveDir.magnitude > 5.0f && playerMovement) {
+		if (moveDir.magnitude > 5.0f && manager.Movement) {
 			float xDir = Mathf.Abs (dir.x);
 			float yDir = Mathf.Abs (dir.y);
 			if (xDir >= yDir) {
 				if (moveDir.x > 0) {
-					playerMovement.MoveUntilStop (Enums.directions.right);
+                    manager.Movement.MoveUntilStop (Enums.directions.right);
 				} else if (moveDir.x < 0) {
-					playerMovement.MoveUntilStop (Enums.directions.left);
+                    manager.Movement.MoveUntilStop (Enums.directions.left);
 				}
 			} else if (xDir < yDir) {
 				if (moveDir.y > 0) {
-					playerMovement.MoveUntilStop (Enums.directions.up);
+                    manager.Movement.MoveUntilStop (Enums.directions.up);
 				} else if (moveDir.y < 0) {
-					playerMovement.MoveUntilStop (Enums.directions.down);
+                    manager.Movement.MoveUntilStop (Enums.directions.down);
 				}
 			}
 		}

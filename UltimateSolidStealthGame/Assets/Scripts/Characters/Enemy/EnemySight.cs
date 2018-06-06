@@ -49,9 +49,9 @@ public abstract class EnemySight : MonoBehaviour {
 	*/
 	protected EnemyManager manager;
 	/*
-	 	layer that defines all non "Enemy" layers
+	 	layer that defines all non layers in sight
 	*/
-	protected int ignoreEnemiesLayer;
+	protected int sightLayer;
 	/*
 	 	list used to store indices of vertices that make up path to player
 	*/
@@ -61,8 +61,8 @@ public abstract class EnemySight : MonoBehaviour {
 	*/
 	protected int currentFOV;
 
-	public int IgnoreEnemiesLayer {
-		get { return ignoreEnemiesLayer; }
+	public int SightLayer {
+		get { return sightLayer; }
 	}
 	public bool Alerted {
 		get { return alerted; }
@@ -79,8 +79,9 @@ public abstract class EnemySight : MonoBehaviour {
     }
 		
 	protected virtual void Start () {
-		ignoreEnemiesLayer = 1 << LayerMask.NameToLayer ("Enemy");
-		ignoreEnemiesLayer = ~ignoreEnemiesLayer;
+		sightLayer = 1 << LayerMask.NameToLayer ("Enemy");
+        sightLayer += (1 << LayerMask.NameToLayer("Ignore Raycast"));
+		sightLayer = ~sightLayer;
 		GameObject temp = GameObject.FindGameObjectWithTag ("Player");
 		if (temp) {
 			playerMovement = temp.GetComponent<PlayerMovement> ();
@@ -105,5 +106,15 @@ public abstract class EnemySight : MonoBehaviour {
 	*/
 	protected abstract void CheckSightline ();
 
-
+    public virtual void SetSightOnPlayer() {
+        alerted = true;
+        if (manager.IsBoss) {
+            pathToPlayer = manager.Graph.FindShortestPath(manager.Movement.CurrVertexIndex, playerMovement.ParentVertexIndex);
+        } else {
+            pathToPlayer = manager.Graph.FindShortestPath(manager.Movement.CurrVertexIndex, playerMovement.CurrVertexIndex);
+        }
+        if (pathToPlayer.Count > 0) {
+            manager.Movement.Path = pathToPlayer;
+        }
+    }
 }

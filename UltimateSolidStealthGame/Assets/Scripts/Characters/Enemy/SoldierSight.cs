@@ -28,9 +28,13 @@ public class SoldierSight : EnemySight{
 				currentFOV = (alerted) ? alertedFOV : FOV;
 				if (angle <= currentFOV && toPlayer.magnitude <= sightDistance) { 
 					RaycastHit hit;
-					if (Physics.Raycast(transform.position, toPlayer, out hit, Mathf.Infinity, ignoreEnemiesLayer)) {
+					if (Physics.Raycast(transform.position, toPlayer, out hit, Mathf.Infinity, sightLayer)) {
 						if (hit.transform.CompareTag ("Player")) {
-							pathToPlayer = manager.Graph.FindShortestPath (manager.Movement.CurrVertexIndex, playerMovement.CurrVertexIndex);
+                            if (manager.IsBoss) {
+                                pathToPlayer = manager.Graph.FindShortestPath(manager.Movement.CurrVertexIndex, playerMovement.ParentVertexIndex);
+                            } else {
+                                pathToPlayer = manager.Graph.FindShortestPath(manager.Movement.CurrVertexIndex, playerMovement.CurrVertexIndex);
+                            }
 							if (pathToPlayer.Count > 0) {
 								alerted = true;
 								if (manager.Distraction) {
