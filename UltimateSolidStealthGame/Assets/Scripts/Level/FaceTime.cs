@@ -10,33 +10,44 @@ public class FaceTime : MonoBehaviour {
     string[] callerText;
     [SerializeField]
     GameObject textBoxObject;
+    [SerializeField]
+    Text incomingCallText;
 
     VideoPlayer player;
     RawImage image;
     RenderTexture text;
     Text callerTextBox;
+    RawImage phoneIcon;
     RawImage background;
+    LevelManager levelManager;
     bool runningText;                   //Whether text is currently running in TextBox
     bool canStartText;
     int currTextIndex;
+    Vector3 newScale;
+    float scale;
 
     void Start() {
-        Time.timeScale = 0.0f;
+        AudioListener.pause = true;
+        newScale = new Vector3();
         textBoxObject.transform.localScale = Vector3.zero;
         player = GetComponent<VideoPlayer>();
+        phoneIcon = incomingCallText.GetComponentInChildren<RawImage>();
+        phoneIcon.rectTransform.localScale = Vector3.zero;
+        incomingCallText.enabled = false;
         image = GetComponent<RawImage>();
+        levelManager = GameObject.FindGameObjectWithTag("LevelManager").GetComponent<LevelManager>();
         background = transform.parent.GetComponent<RawImage>();
-        callerTextBox = transform.parent.GetComponentInChildren<Text>();
+        callerTextBox = textBoxObject.GetComponentInChildren<Text>();
         image.transform.localScale = Vector3.zero;
         text = new RenderTexture((int)player.clip.width, (int)player.clip.height, 0);
         player.targetTexture = text;
         image.texture = text;
-        StartCoroutine("FaceTimePopUp");
+        StartCoroutine("PlayPhoneIcon");
     }
 
     void Update () {
-		if (Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Began) {
-            if (canStartText) {
+        if (canStartText) {
+            if (Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Began) {
                 if (runningText) {
                     StopAllCoroutines();
                     textBoxObject.transform.localScale = Vector3.one;
@@ -57,6 +68,55 @@ public class FaceTime : MonoBehaviour {
         }
 	}
 
+    IEnumerator PlayPhoneIcon() {
+        Vector3 startPos = phoneIcon.transform.localPosition;
+        Vector3 leftPos = startPos;
+        Vector3 rightPos = leftPos;
+        leftPos.x = -7;
+        rightPos.x = 7;
+        for (int i = 0; i <= 16; i += 2) {
+            scale = i / 10.0f;
+            newScale.Set(scale, scale, scale);
+            yield return phoneIcon.rectTransform.localScale = newScale;
+        }
+
+        for (int i = 16; i >= 10; i -= 2) {
+            scale = i / 10.0f;
+            newScale.Set(scale, scale, scale);
+            yield return phoneIcon.rectTransform.localScale = newScale;
+        }
+        incomingCallText.enabled = true;
+        for (int i = 0; i < 50; i++) {
+            if (i == 24) {
+                yield return new WaitForSeconds(0.5f);
+            } else {
+                if (i % 2 == 0) {
+                    yield return phoneIcon.rectTransform.localPosition = leftPos;
+                }
+                else {
+                    yield return phoneIcon.rectTransform.localPosition = rightPos;
+                }
+            }
+        }
+        yield return phoneIcon.rectTransform.localPosition = startPos;
+        /*yield return new WaitForSeconds(0.5f);
+        incomingCallText.enabled = false;
+        for (int i = 10; i <= 16; i += 2) {
+            scale = i / 10.0f;
+            newScale.Set(scale, scale, scale);
+            yield return phoneIcon.rectTransform.localScale = newScale;
+        }
+        for (int i = 16; i >= 0; i -= 2) {
+            scale = i / 10.0f;
+            newScale.Set(scale, scale, scale);
+            yield return phoneIcon.rectTransform.localScale = newScale;
+        }*/
+        yield return new WaitForSeconds(0.5f);
+        incomingCallText.gameObject.SetActive(false);
+        yield return new WaitForSeconds(0.25f);
+        StartCoroutine("FaceTimePopUp");
+    }
+
     void FinishCall() {
         textBoxObject.SetActive(false);
         StopAllCoroutines();
@@ -65,8 +125,6 @@ public class FaceTime : MonoBehaviour {
     }
 
     IEnumerator FaceTimePopUp() {
-        Vector3 newScale = new Vector3();
-        float scale;
         for (int i = 0; i <= 16; i += 2) {
             scale = i / 10.0f;
             newScale.Set(scale, scale, scale);
@@ -83,9 +141,8 @@ public class FaceTime : MonoBehaviour {
     }
 
     IEnumerator FaceTimeClose() {
-        Vector3 newScale = new Vector3();
-        float scale;
         Color temp = background.color;
+        Color red = Color.red;
         for (int i = 10; i <= 16; i += 2) {
             scale = i / 10.0f;
             newScale.Set(scale, scale, scale);
@@ -96,35 +153,42 @@ public class FaceTime : MonoBehaviour {
             newScale.Set(scale, scale, scale);
             yield return image.rectTransform.localScale = newScale;
         }
-        yield return new WaitForSeconds(1.0f);
+        yield return new WaitForSeconds(0.2f);
+        incomingCallText.gameObject.SetActive(true);
+        incomingCallText.enabled = true;
+        incomingCallText.text = "Call Ended";
+        phoneIcon.rectTransform.localScale = Vector3.one;
+        phoneIcon.color = red;
+        image.enabled = false;
+        yield return new WaitForSeconds(1.5f);
+        incomingCallText.enabled = false;
         for (int i = 20; i >= 0; i--) {
             temp.a = i / 20.0f;
+            red.a = i / 20.0f;
+            phoneIcon.color = red;
             yield return background.color = temp;
         }
-        Debug.Log(Time.timeScale);
+        AudioListener.pause = false;
+        levelManager.StartLevelMusic();
         background.gameObject.SetActive(false);
     }
 
     IEnumerator DisplayText(string text) {
         player.Play();
         callerTextBox.text = "";
-        //runningText = false;
         runningText = true;
         textBoxObject.transform.localScale = Vector3.zero;
-        Vector3 newScale = new Vector3();
-        float scale;
-        for (int i = 0; i <= 14; i += 2) {
+        for (int i = 0; i <= 12; i += 2) {
             scale = i / 10.0f;
             newScale.Set(scale, scale, scale);
             yield return textBoxObject.transform.localScale = newScale;
         }
-        for (int i = 14; i >= 10; i -= 2) {
+        for (int i = 12; i >= 10; i -= 2) {
             scale = i / 10.0f;
             newScale.Set(scale, scale, scale);
             yield return textBoxObject.transform.localScale = newScale;
         }
         yield return new WaitForSeconds(0.05f);
-        //runningText = true;
         foreach (char character in text) {
             yield return callerTextBox.text += character;
         }
@@ -134,9 +198,7 @@ public class FaceTime : MonoBehaviour {
     }
 
     void ResetCallerFace() {
-        Debug.Log(player.frame);
-        player.Stop();
-        player.frame = 1;
-        Debug.Log(player.frame);
+        player.Pause();
+        player.frame = 0;
     }
 }
