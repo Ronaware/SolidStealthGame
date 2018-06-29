@@ -39,23 +39,23 @@ public class EnemySightPlane : MonoBehaviour {
 	List<int> newIndices;
     Vector3 startPosition;
 
-	void Start () {
-		manager = GetComponent<EnemyManager> ();
-		newVerts = new List<Vector3> ();
-		newIndices = new List<int> ();
-		defaultLayer = 1 << LayerMask.NameToLayer ("Default");
-		sightPlane = Instantiate (planePrefab);
+	void Start() {
+		manager = GetComponent<EnemyManager>();
+		newVerts = new List<Vector3>();
+		newIndices = new List<int>();
+		defaultLayer = 1 << LayerMask.NameToLayer("Default");
+		sightPlane = Instantiate(planePrefab);
 		sightPlane.transform.position = Vector3.zero;
-		sightPlaneMesh = sightPlane.GetComponent<MeshFilter> ().mesh;
-		sightPlaneMesh.Clear ();
+		sightPlaneMesh = sightPlane.GetComponent<MeshFilter>().mesh;
+		sightPlaneMesh.Clear();
         startPosition = transform.position;
         startPosition[1] = manager.Graph.FloorTop + 0.01f;
 	}
 
-	void Update () {
+	void Update() {
         startPosition = transform.position;
         startPosition[1] = manager.Graph.FloorTop + 0.01f;
-        CreatePlane ();
+        CreatePlane();
 	}
 
 	/*
@@ -64,35 +64,35 @@ public class EnemySightPlane : MonoBehaviour {
 		goes from -fov to fov in equal angular increments
 	*/
 	void CreatePlane() {
-		sightPlaneMesh.Clear ();
-		newIndices.Clear ();
-		newVerts.Clear ();
-		newVerts.Add (startPosition);
+		sightPlaneMesh.Clear();
+		newIndices.Clear();
+		newVerts.Clear();
+		newVerts.Add(startPosition);
 		int fov = manager.Sight.CurrentFOV;
 		float currAngle = -fov;
 		float deltaAngle = (fov * 2.0f) / (fov - 1);
 		for (int i = 0; i < fov; i++) {
-			Vector3 dir = Quaternion.AngleAxis (currAngle, Vector3.up) * transform.forward;
+			Vector3 dir = Quaternion.AngleAxis(currAngle, Vector3.up) * transform.forward;
 			RaycastHit hit;
-			if (Physics.Raycast (startPosition, dir, out hit, manager.Sight.SightDistance, defaultLayer)) {
-				newVerts.Add (hit.point);
+			if (Physics.Raycast(startPosition, dir, out hit, manager.Sight.SightDistance, defaultLayer)) {
+				newVerts.Add(hit.point);
 			} else {
-				newVerts.Add (startPosition + (manager.Sight.SightDistance * dir));
+				newVerts.Add(startPosition + (manager.Sight.SightDistance * dir));
 			}
 			if (i == 0) {
-				newIndices.Add (i);
+				newIndices.Add(i);
 			} else if (i != fov - 1) {
-				newIndices.Add (i);
-				newIndices.Add (0);
-				newIndices.Add (i);
+				newIndices.Add(i);
+				newIndices.Add(0);
+				newIndices.Add(i);
 			} else {
-				newIndices.Add (i);
-				newIndices.Add (0);
+				newIndices.Add(i);
+				newIndices.Add(0);
 			}
 			currAngle += deltaAngle;
 		}
-		sightPlaneMesh.vertices = newVerts.ToArray ();
-		sightPlaneMesh.triangles = newIndices.ToArray ();
+		sightPlaneMesh.vertices = newVerts.ToArray();
+		sightPlaneMesh.triangles = newIndices.ToArray();
 	}
 
     void OnDisable() {

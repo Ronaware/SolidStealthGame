@@ -28,24 +28,38 @@ public class SoldierSight : EnemySight{
 				currentFOV = (alerted) ? alertedFOV : FOV;
 				if (angle <= currentFOV && toPlayer.magnitude <= sightDistance) { 
 					RaycastHit hit;
-					if (Physics.Raycast(transform.position, toPlayer, out hit, Mathf.Infinity, sightLayer)) {
-						if (hit.transform.CompareTag ("Player")) {
-                            if (manager.IsBoss) {
-                                pathToPlayer = manager.Graph.FindShortestPath(manager.Movement.CurrVertexIndex, playerMovement.ParentVertexIndex);
-                            } else {
-                                pathToPlayer = manager.Graph.FindShortestPath(manager.Movement.CurrVertexIndex, playerMovement.CurrVertexIndex);
+                    if (!alerted) {
+                        if (Physics.Raycast(transform.position, toPlayer, out hit, Mathf.Infinity, sightLayer)) {
+                            if (hit.transform.CompareTag("Player")) {
+                                SeePlayer();
                             }
-							if (pathToPlayer.Count > 0) {
-								alerted = true;
-								if (manager.Distraction) {
-									manager.Distraction.Distracted = false;
-								}
-								manager.Movement.Path = pathToPlayer;
-							}
-						}
-					}
+                        }
+					} else {
+                        if (Physics.Raycast(transform.position, toPlayer, out hit, Mathf.Infinity, specialSightLayer)) {
+                            if (hit.transform.CompareTag("Player")) {
+                                SeePlayer();
+                            }
+                        }
+                    }
 				}
 			}
 		}
 	}
+
+    void SeePlayer() {
+        if (manager.IsBoss) {
+            pathToPlayer = manager.Graph.FindShortestPath(manager.Movement.CurrVertexIndex, playerMovement.ParentVertexIndex);
+        } else {
+            pathToPlayer = manager.Graph.FindShortestPath(manager.Movement.CurrVertexIndex, playerMovement.CurrVertexIndex);
+        }
+        if (reporter) reporter.ReportToManager();
+        if (pathToPlayer.Count > 0) {
+            if (!Alerted) manager.ShowMark("Exclamation");
+            Alerted = true;
+            if (manager.Distraction) {
+                manager.Distraction.ResetDistraction();
+            }
+            manager.Movement.Path = pathToPlayer;
+        }
+    }
 }

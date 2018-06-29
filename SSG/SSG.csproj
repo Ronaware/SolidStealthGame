@@ -272,6 +272,9 @@
     <Reference Include="SyntaxTree.VisualStudio.Unity.Bridge">
       <HintPath>C:/Program Files (x86)/Microsoft Visual Studio Tools for Unity/15.0/Editor/SyntaxTree.VisualStudio.Unity.Bridge.dll</HintPath>
     </Reference>
+    <Reference Include="MeshPainter">
+      <HintPath>Assets/MeshPainter/Editor/MeshPainter.dll</HintPath>
+    </Reference>
     <Reference Include="ProBuilderCore-Unity5">
       <HintPath>Assets/ProCore/ProBuilder/Classes/ProBuilderCore-Unity5.dll</HintPath>
     </Reference>
@@ -310,9 +313,6 @@
     </Reference>
     <Reference Include="UnityEngine.StandardEvents">
       <HintPath>C:/Users/Natha/AppData/LocalLow/Unity/cache/packages/packages.unity.com/com.unity.standardevents@1.0.10/UnityEngine.StandardEvents.dll</HintPath>
-    </Reference>
-    <Reference Include="MeshPainter">
-      <HintPath>Assets/MeshPainter/Editor/MeshPainter.dll</HintPath>
     </Reference>
     <Reference Include="UnityEditor.iOS.Extensions.Xcode">
       <HintPath>C:/Program Files/Unity/Editor/Data/PlaybackEngines/iOSSupport\UnityEditor.iOS.Extensions.Xcode.dll</HintPath>
@@ -391,6 +391,7 @@
     <Compile Include="Assets\Scripts\Characters\Enemy\SnakeSight.cs" />
     <Compile Include="Assets\Scripts\Characters\Enemy\SnakeWeaponSystem.cs" />
     <Compile Include="Assets\Scripts\Characters\Enemy\SoldierSight.cs" />
+    <Compile Include="Assets\Scripts\Characters\Enemy\Symbol.cs" />
     <Compile Include="Assets\Scripts\Characters\HealthBar.cs" />
     <Compile Include="Assets\Scripts\Characters\HealthManager.cs" />
     <Compile Include="Assets\Scripts\Characters\Player\FollowCamera.cs" />
@@ -406,6 +407,8 @@
     <Compile Include="Assets\Scripts\Grid\GridDisplay.cs" />
     <Compile Include="Assets\Scripts\Grid\SnakeGraph.cs" />
     <Compile Include="Assets\Scripts\Grid\Vertex.cs" />
+    <Compile Include="Assets\Scripts\Level\AlertedReporter.cs" />
+    <Compile Include="Assets\Scripts\Level\AlertedSubMission.cs" />
     <Compile Include="Assets\Scripts\Level\EndLevelZone.cs" />
     <Compile Include="Assets\Scripts\Level\FaceTime.cs" />
     <Compile Include="Assets\Scripts\Level\FinaBoss_Part02\BlastZone.cs" />
@@ -418,8 +421,14 @@
     <Compile Include="Assets\Scripts\Level\FinalBoss_Part01\Turret.cs" />
     <Compile Include="Assets\Scripts\Level\FinalBoss_Part01\TurretControl.cs" />
     <Compile Include="Assets\Scripts\Level\FinalBoss_Part01\TurretInteractable.cs" />
+    <Compile Include="Assets\Scripts\Level\GrassImpact.cs" />
     <Compile Include="Assets\Scripts\Level\Interactable.cs" />
+    <Compile Include="Assets\Scripts\Level\KillReporter.cs" />
+    <Compile Include="Assets\Scripts\Level\KillSubMission.cs" />
     <Compile Include="Assets\Scripts\Level\LevelManager.cs" />
+    <Compile Include="Assets\Scripts\Level\MinimapMaterialChanger.cs" />
+    <Compile Include="Assets\Scripts\Level\SubMissionManager.cs" />
+    <Compile Include="Assets\Scripts\MainMenu\ButtonColorPulse.cs" />
     <Compile Include="Assets\Scripts\MainMenu\LevelSelectButton.cs" />
     <Compile Include="Assets\Scripts\MainMenu\LevelSelectScreen.cs" />
     <Compile Include="Assets\Scripts\MainMenu\MainMenu.cs" />
@@ -430,6 +439,9 @@
     <Compile Include="Assets\Scripts\PatrolWaypoint.cs" />
     <Compile Include="Assets\Scripts\PlayerController.cs" />
     <Compile Include="Assets\Scripts\TopDownCamCtrl.cs" />
+    <Compile Include="Assets\Scripts\UI\EquipmentButton.cs" />
+    <Compile Include="Assets\Scripts\UI\MissionFailedScreen.cs" />
+    <Compile Include="Assets\Scripts\UI\MissionSuccessScreen.cs" />
     <Compile Include="Assets\Scripts\UI\PlayerUI.cs" />
     <Compile Include="Assets\Scripts\UI\WeaponSelectWheel.cs" />
     <Compile Include="Assets\Scripts\Weapons\BossGun.cs" />

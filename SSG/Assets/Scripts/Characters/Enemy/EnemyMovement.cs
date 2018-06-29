@@ -15,9 +15,10 @@ public class EnemyMovement : MonoBehaviour {
     public class PairStruct {
         public int index;
         public bool patrolHere;
+        public Vector3 lookDir;
     }
 
-#if UNITY_EDITOR
+    #if UNITY_EDITOR
     [CustomPropertyDrawer(typeof(PairStruct))]
     public class PairStructDrawer : PropertyDrawer {
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label) {
@@ -26,14 +27,16 @@ public class EnemyMovement : MonoBehaviour {
             var indent = EditorGUI.indentLevel;
             EditorGUI.indentLevel = 0;
             var indexRect = new Rect(position.x, position.y, 75, position.height);
-            var patrolHereRect = new Rect(position.x + 80, position.y, 50, position.height);
+            var patrolHereRect = new Rect(position.x + 80, position.y, 20, position.height);
+            var lookDirRect = new Rect(position.x + 105, position.y, 125, position.height);
             EditorGUI.PropertyField(indexRect, property.FindPropertyRelative("index"), GUIContent.none);
             EditorGUI.PropertyField(patrolHereRect, property.FindPropertyRelative("patrolHere"), GUIContent.none);
+            EditorGUI.PropertyField(lookDirRect, property.FindPropertyRelative("lookDir"), GUIContent.none);
             EditorGUI.indentLevel = indent;
             EditorGUI.EndProperty();
         }
     }
-#endif
+    #endif
 
     /*
 		time enemy should pause when they reach patrol point
@@ -98,7 +101,7 @@ public class EnemyMovement : MonoBehaviour {
     int maxPatrolTries = 50;
     int numPatrolTries;
     bool moving;
-
+    bool heardSound;
 
     public int CurrVertexIndex {
 		get { return currVertexIndex; }
@@ -117,10 +120,17 @@ public class EnemyMovement : MonoBehaviour {
         get { return moving; }
         set { moving = value; }
     }
+    public bool HeardSound {
+        get { return heardSound; }
+        set { heardSound = value; }
+    }
 
-	protected void Start() {
+    void Awake() {
+        nav = GetComponent<UnityEngine.AI.NavMeshAgent>();
+    }
+
+    protected void Start() {
 		manager = GetComponent<EnemyManager> ();
-		nav = GetComponent<UnityEngine.AI.NavMeshAgent> ();
         audioSource = GetComponent<AudioSource>();
         audioSource.loop = true;
 		path = new List<int> ();
@@ -144,30 +154,29 @@ public class EnemyMovement : MonoBehaviour {
 	*/
 	protected void Update() {
 		if (manager && manager.Graph.Ready) {
-			if (manager.Sight && !manager.Sight.Alerted) {
-				if (manager.Distraction && !manager.Distraction.Distracted) {
-					BackToPatrol ();
-				} else if (!manager.Distraction) {
-					BackToPatrol ();
-				}
-			}
+            if (heardSound && path.Count == 0) {
+                heardSound = false;
+                PauseMovement(pauseLength);
+            }
 			TravelBetweenPathPoints ();
-			OnPatrol ();
-			if (showDebug) {
-				foreach (int i in path) {
-					Vector3 pos = manager.Graph.vertices [i].position;
-					Debug.DrawLine (pos, pos + (Vector3.up * 5.0f), Color.red, 0.01f);
-				}
-			}
-		} 
-	}
+            if (path.Count == 0) OnPatrol();
+        }
+        #if UNITY_EDITOR
+        if (showDebug) {
+            foreach (int i in path) {
+                Vector3 pos = manager.Graph.vertices[i].position;
+                Debug.DrawLine(pos, pos + (Vector3.up * 5.0f), Color.red, 0.01f);
+            }
+        }
+        #endif
+    }
 
-	/*
+    /*
 		Sets new destination patrol vertex if enemy has reached current patrol
 	*/
-	protected void OnPatrol() {
+    protected void OnPatrol() {
         if (moving) {
-            if (patrolVertices.Count > 1) {
+            if (patrolVertices.Count >= 1) {
                 if ((manager.Sight && !manager.Sight.Alerted) || !manager.Sight) {
                     if ((manager.Distraction && !manager.Distraction.Distracted) || !manager.Distraction) {
                         int patrolIndexInGraph = patrolVertices[destPatrolIndex].index;
@@ -177,8 +186,11 @@ public class EnemyMovement : MonoBehaviour {
                         float destX = v.position.x;
                         float destZ = v.position.z;
                         if ((Mathf.Abs(destX - currX) <= nav.stoppingDistance) && (Mathf.Abs(destZ - currZ) <= nav.stoppingDistance)) {
-                            if (patrolVertices[destPatrolIndex].patrolHere) PauseMovement(pauseLength);
+                            PairStruct currPatrolStruct = patrolVertices[destPatrolIndex];
+                            if (currPatrolStruct.patrolHere) PauseMovement(pauseLength);
+                            if (currPatrolStruct.lookDir != Vector3.zero) Turn(currPatrolStruct.lookDir);
                             destPatrolIndex = (destPatrolIndex + 1) % patrolVertices.Count;
+                            BackToPatrol();
                         }
                     }
                 }
@@ -261,7 +273,7 @@ public class EnemyMovement : MonoBehaviour {
 	public void BackToPatrol() {
 		if (patrolVertices.Count > 0) {
 			List<int> newPath = manager.Graph.FindShortestPath (currVertexIndex, patrolVertices[destPatrolIndex].index);
-			if (newPath.Count > 0) {
+			if (newPath.Count > 1) {
                 numPatrolTries = 0;
                 path = newPath;
 			} else {
@@ -280,17 +292,29 @@ public class EnemyMovement : MonoBehaviour {
 	*/
 	public void PauseMovement(float length) {
         audioSource.Stop();
-		StartCoroutine ("Pause", length);
+        StopCoroutine("Pause");
+        StartCoroutine(Pause(length));
 	}
 
-	IEnumerator Pause(float length) {
+    public void StopMovement(float time) {
+        audioSource.Stop();
+        StartCoroutine(Stop(time));
+    }
+
+    IEnumerator Stop(float time) {
+        moving = false;
+        yield return new WaitForSeconds(time);
+        moving = true;
+    }
+
+    IEnumerator Pause(float length) {
 		enabled = false;
 		for (int i = 0; i < length; i++) {
-			if (!manager.Sight.Alerted) {
+            if (!manager.Sight.Alerted) {
 				yield return new WaitForSeconds (0.1f);
-			} else if (manager.Sight.Alerted || (manager.Distraction && manager.Distraction.Distracted) || path.Count != 0){
+			} else if (manager.Sight.Alerted ||manager.Distraction.Distracted || heardSound || path.Count != 0){
 				enabled = true;
-				yield break;
+                yield break;
 			}
 		}
 		if (path.Count == 0) {
@@ -312,11 +336,12 @@ public class EnemyMovement : MonoBehaviour {
 		if (transform.forward.normalized != towards.normalized) {
 			int count = 0;
 			float angle = Vector3.SignedAngle (transform.forward.normalized, towards.normalized, Vector3.up);
-			while (Mathf.Abs (Vector3.Angle (transform.forward.normalized, towards.normalized)) >= 15.0f && count <= 12) {
+            float turnSpeed = 10.0f;
+            while (Mathf.Abs(Vector3.SignedAngle(transform.forward.normalized, towards.normalized, Vector3.up)) >= turnSpeed && count <= (180.0f / turnSpeed)) {
 				if (angle < 0.0f) {
-					transform.rotation *= Quaternion.Euler (0.0f, -15.0f, 0.0f);
+					transform.rotation *= Quaternion.Euler (0.0f, -turnSpeed, 0.0f);
 				} else {
-					transform.rotation *= Quaternion.Euler (0.0f, 15.0f, 0.0f);
+					transform.rotation *= Quaternion.Euler (0.0f, turnSpeed, 0.0f);
 				}
 				count++;
 				yield return null;
@@ -324,4 +349,29 @@ public class EnemyMovement : MonoBehaviour {
 			transform.rotation = Quaternion.LookRotation(towards);
 		}
 	}
+
+    public void SetPathToSound(Vector3 loc) {
+        if (!manager.Sight.Alerted && !manager.Distraction.Distracted) {
+            if (!heardSound) {
+                if (SetPathToLocation(loc, 15)) {
+                    heardSound = true;
+                    manager.ShowMark("Question");
+                }
+            } else {
+                SetPathToLocation(loc, 10);
+            }
+        }
+    }
+
+    public bool SetPathToLocation(Vector3 loc, int maxLength = -1) {
+        int dest = manager.Graph.GetIndexFromPosition(loc);
+        List<int> temp = manager.Graph.FindShortestPath(currVertexIndex, dest);
+        if (temp.Count > 0) {
+            if ((maxLength == -1) || (maxLength != -1 && temp.Count <= maxLength)) {
+                path = temp;
+                return true;
+            }
+        }
+        return false;
+    }
 }

@@ -7,36 +7,48 @@ using UnityEngine.UI;
 public class FaceTime : MonoBehaviour {
 
     [SerializeField]
+    [TextArea]
     string[] callerText;
     [SerializeField]
     GameObject textBoxObject;
+    [SerializeField]
+    RectTransform callerRect;
+    [SerializeField]
+    CanvasGroup incomingCallPanel;
+    [SerializeField]
+    GameObject faceTimePanel;
 
     VideoPlayer player;
     RawImage image;
-    RenderTexture text;
+    RenderTexture texture;
     Text callerTextBox;
     RawImage background;
+    LevelManager levelManager;
     bool runningText;                   //Whether text is currently running in TextBox
     bool canStartText;
     int currTextIndex;
+    RectTransform screenRect;
+    int screenWidthHalf;
 
     void Start() {
-        Time.timeScale = 0.0f;
+        AudioListener.pause = true;
         textBoxObject.transform.localScale = Vector3.zero;
-        player = GetComponent<VideoPlayer>();
-        image = GetComponent<RawImage>();
-        background = transform.parent.GetComponent<RawImage>();
-        callerTextBox = transform.parent.GetComponentInChildren<Text>();
-        image.transform.localScale = Vector3.zero;
-        text = new RenderTexture((int)player.clip.width, (int)player.clip.height, 0);
-        player.targetTexture = text;
-        image.texture = text;
-        StartCoroutine("FaceTimePopUp");
+        player = callerRect.GetComponent<VideoPlayer>();
+        image = callerRect.GetComponent<RawImage>();
+        levelManager = GameObject.FindGameObjectWithTag("LevelManager").GetComponent<LevelManager>();
+        callerTextBox = textBoxObject.GetComponentInChildren<Text>();
+        texture = new RenderTexture((int)player.clip.width, (int)player.clip.height, 0);
+        player.targetTexture = texture;
+        image.texture = texture;
+        screenRect = GetComponent<RectTransform>();
+        screenWidthHalf = (int)(GameObject.FindGameObjectWithTag("UI").GetComponent<PlayerUI>().ScreenWidth / 2.0f);
+        faceTimePanel.SetActive(false);
+        gameObject.SetActive(false);
     }
 
     void Update () {
-		if (Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Began) {
-            if (canStartText) {
+        if (canStartText) {
+            if (Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Began) {
                 if (runningText) {
                     StopAllCoroutines();
                     textBoxObject.transform.localScale = Vector3.one;
@@ -57,6 +69,11 @@ public class FaceTime : MonoBehaviour {
         }
 	}
 
+    public void StartCall() {
+        gameObject.SetActive(true);
+        StartCoroutine("FlashIncomingCall");
+    }
+
     void FinishCall() {
         textBoxObject.SetActive(false);
         StopAllCoroutines();
@@ -64,67 +81,73 @@ public class FaceTime : MonoBehaviour {
         canStartText = false;
     }
 
+    IEnumerator FlashIncomingCall() {
+        for (int j = 0; j < 2; j++) {
+            for (int i = 0; i <= 20; i++) {
+                yield return incomingCallPanel.alpha = i / 20.0f;
+            }
+            for (int i = 20; i >= 0; i--) {
+                yield return incomingCallPanel.alpha = i / 20.0f;
+            }
+        }
+        incomingCallPanel.gameObject.SetActive(false);
+        StartCoroutine("FaceTimePopUp");
+    }
+
     IEnumerator FaceTimePopUp() {
-        Vector3 newScale = new Vector3();
-        float scale;
-        for (int i = 0; i <= 16; i += 2) {
-            scale = i / 10.0f;
-            newScale.Set(scale, scale, scale);
-            yield return image.rectTransform.localScale = newScale;
+        faceTimePanel.SetActive(true);
+        float height = screenRect.rect.height;
+        Vector2 newSize = new Vector2();
+        for (int i = screenWidthHalf; i > -100; i -= 100) {
+            if (i < 0) i = 0;
+            newSize.Set(i, 0);
+            screenRect.offsetMin = newSize;
+            screenRect.offsetMax = -newSize;
+            yield return null;
         }
-        for (int i = 16; i >= 10; i -= 2) {
-            scale = i / 10.0f;
-            newScale.Set(scale, scale, scale);
-            yield return image.rectTransform.localScale = newScale;
+        for (int i = 0; i <= 500; i += 100) {
+            newSize.Set(i, 250);
+            yield return callerRect.sizeDelta = newSize;
         }
-        yield return new WaitForSeconds(0.25f);
         canStartText = true;
+        yield return new WaitForSeconds(0.125f);
         StartCoroutine(DisplayText(callerText[0]));
     }
 
     IEnumerator FaceTimeClose() {
-        Vector3 newScale = new Vector3();
-        float scale;
-        Color temp = background.color;
-        for (int i = 10; i <= 16; i += 2) {
-            scale = i / 10.0f;
-            newScale.Set(scale, scale, scale);
-            yield return image.rectTransform.localScale = newScale;
+        float height = screenRect.rect.height;
+        Vector2 newSize = new Vector2();
+        for (int i = 500; i >= 0; i -= 100) {
+            newSize.Set(i, 250);
+            yield return callerRect.sizeDelta = newSize;
         }
-        for (int i = 16; i >= 0; i -= 2) {
-            scale = i / 10.0f;
-            newScale.Set(scale, scale, scale);
-            yield return image.rectTransform.localScale = newScale;
+        for (int i = 0; i <= screenWidthHalf + 100; i += 100) {
+            int j = i;
+            if (i > screenWidthHalf) j = screenWidthHalf;
+            newSize.Set(j, 0);
+            screenRect.offsetMin = newSize;
+            screenRect.offsetMax = -newSize;
+            yield return null;
         }
-        yield return new WaitForSeconds(1.0f);
-        for (int i = 20; i >= 0; i--) {
-            temp.a = i / 20.0f;
-            yield return background.color = temp;
-        }
-        Debug.Log(Time.timeScale);
-        background.gameObject.SetActive(false);
+        image.enabled = false;
+        AudioListener.pause = false;
+        levelManager.StartLevelMusic();
+        gameObject.SetActive(false);
     }
 
     IEnumerator DisplayText(string text) {
         player.Play();
         callerTextBox.text = "";
-        //runningText = false;
         runningText = true;
         textBoxObject.transform.localScale = Vector3.zero;
-        Vector3 newScale = new Vector3();
         float scale;
-        for (int i = 0; i <= 14; i += 2) {
-            scale = i / 10.0f;
-            newScale.Set(scale, scale, scale);
-            yield return textBoxObject.transform.localScale = newScale;
-        }
-        for (int i = 14; i >= 10; i -= 2) {
+        Vector3 newScale = new Vector3();
+        for (int i = 0; i <= 10; i += 2) {
             scale = i / 10.0f;
             newScale.Set(scale, scale, scale);
             yield return textBoxObject.transform.localScale = newScale;
         }
         yield return new WaitForSeconds(0.05f);
-        //runningText = true;
         foreach (char character in text) {
             yield return callerTextBox.text += character;
         }
@@ -134,9 +157,7 @@ public class FaceTime : MonoBehaviour {
     }
 
     void ResetCallerFace() {
-        Debug.Log(player.frame);
-        player.Stop();
-        player.frame = 1;
-        Debug.Log(player.frame);
+        player.Pause();
+        player.frame = 0;
     }
 }

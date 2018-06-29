@@ -23,7 +23,10 @@ public class PlayerUI : MonoBehaviour {
 		slider to display ice machine usage
 	*/
 	[SerializeField]
-	Slider slider;
+	Image slider;
+
+    [SerializeField]
+    RawImage mainIcon;
 	/*
 		reference to WeaponWheel object prefab
 	*/
@@ -37,6 +40,10 @@ public class PlayerUI : MonoBehaviour {
     GameObject optionsScreenObject;
     [SerializeField]
     GameObject healthBarObject;
+    [SerializeField]
+    GameObject crouchButtonObject;
+    [SerializeField]
+    Sprite[] crouchSprites;
 
 	/*
 		reference to WeaponSelectWheel component of weaponwheel object
@@ -72,37 +79,46 @@ public class PlayerUI : MonoBehaviour {
 	bool primaryPressed;
 
     Slider healthBar;
+    Button crouchButton;
+    RectTransform screenRect;
+    int screenWidth;
+
+    public int ScreenWidth {
+        get { return screenWidth; }
+    }
 
 	void Awake () {
-		equipmentInstanceList = new List<GameObject> ();
+		if (equipmentInstanceList == null) equipmentInstanceList = new List<GameObject> ();
 		GameObject player = GameObject.FindGameObjectWithTag ("Player");
+        screenRect = GetComponent<RectTransform>();
 		if (player) {
 			manager = player.GetComponent<PlayerManager> ();
 			if (manager) {
-				GameObject temp = GameObject.Instantiate (weaponWheelPrefab);
-				temp.transform.SetParent(gameObject.transform, false);
+				GameObject temp = Instantiate (weaponWheelPrefab, mainButtonObject.transform, false);
 				RectTransform rect = temp.GetComponent<RectTransform> ();
-				rect.position = new Vector3 (Screen.width / 2.0f, Screen.height / 2.0f, 0.0f);
-				rect.localScale = Vector3.one;
+                //rect.position = new Vector3 (Screen.width / 2.0f, Screen.height / 2.0f, 0.0f);
+                rect.localPosition = Vector3.zero;
+                rect.localScale = Vector3.one;
 				weaponWheel = temp.GetComponent<WeaponSelectWheel> ();
-			}
+            }
 		}
         healthBar = healthBarObject.GetComponent<Slider>();
-        optionsScreenObject.SetActive(false);
+        crouchButton = crouchButtonObject.GetComponent<Button>();
+        screenWidth = (int)(screenRect.rect.width + 1);
 	}
 
-	void Update () {
+    void Update () {
         healthBar.value = manager.Health.HealthRatio;
 		if (currEquipment) {
             if (!optionsScreenObject.activeSelf) {
-                Time.timeScale = 1.0f;
                 mainButtonObject.SetActive(true);
                 optionsButtonObject.SetActive(true);
+                crouchButtonObject.SetActive(true);
                 if (counter.IsActive()) {
                     counter.text = "x" + currEquipment.Count.ToString();
                 }
                 else if (slider.IsActive()) {
-                    slider.value = currEquipment.Count / 100.0f;
+                    slider.fillAmount = currEquipment.Count / 100.0f;
                 }
                 if (primaryPressed) {
                     float time = Time.time - pressTime;
@@ -122,7 +138,8 @@ public class PlayerUI : MonoBehaviour {
 		@param e - reference to instance of new Equipment object
 	*/
 	public void AddEquipment(ref GameObject e) {
-		equipmentInstanceList.Add (e);
+        if (equipmentInstanceList == null) equipmentInstanceList = new List<GameObject>();
+        equipmentInstanceList.Add (e);
 		Equipment equipment = e.GetComponent<Equipment> ();
 		GameObject newEquipment = Instantiate (buttonPrefab);
 		Button button = newEquipment.GetComponent<Button> ();
@@ -140,7 +157,7 @@ public class PlayerUI : MonoBehaviour {
 	public void OnPrimaryDown() {
 		if (wheelDisplayed) {
 			weaponWheel.HideWheel();
-			wheelDisplayed = false;
+            wheelDisplayed = false;
 		} else {
 			pressTime = Time.time;
 			primaryPressed = true;
@@ -165,7 +182,7 @@ public class PlayerUI : MonoBehaviour {
 	public void UpdateUIOnGunSwap(Equipment e, string s) {
 		currEquipmentType = s;
 		currEquipment = e;
-		weaponWheel.HideWheel ();
+		if (wheelDisplayed) weaponWheel.HideWheel ();
 		wheelDisplayed = false;
 		if (e.GetComponent<Gun>() || e.GetComponent<Cigarette>()) {
 			counter.gameObject.SetActive(true);
@@ -180,9 +197,18 @@ public class PlayerUI : MonoBehaviour {
 	}
 
     public void DisplayOptions() {
-        Time.timeScale = 0.0f;
         mainButtonObject.SetActive(false);
         optionsButtonObject.SetActive(false);
+        crouchButtonObject.SetActive(false);
         optionsScreenObject.SetActive(true);
+    }
+
+    public void OnCrouchClick() {
+        if (manager.Movement.IsCrounching) {
+            crouchButton.image.sprite = crouchSprites[1];
+        } else {
+            crouchButton.image.sprite = crouchSprites[0];
+        }
+        manager.Movement.ToggleCrouch();
     }
 }
