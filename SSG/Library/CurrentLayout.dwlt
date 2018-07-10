@@ -88,7 +88,7 @@ MonoBehaviour:
     serializedVersion: 2
     x: 0
     y: 0
-    width: 285
+    width: 202
     height: 444
   m_MinSize: {x: 200, y: 200}
   m_MaxSize: {x: 4000, y: 4000}
@@ -249,12 +249,12 @@ MonoBehaviour:
   m_Children: []
   m_Position:
     serializedVersion: 2
-    x: 285
+    x: 202
     y: 0
-    width: 958
+    width: 1041
     height: 444
-  m_MinSize: {x: 200, y: 200}
-  m_MaxSize: {x: 4000, y: 4000}
+  m_MinSize: {x: 204, y: 221}
+  m_MaxSize: {x: 4004, y: 4021}
   m_ActualView: {fileID: 17}
   m_Panes:
   - {fileID: 17}
@@ -369,10 +369,10 @@ MonoBehaviour:
   m_LastProjectPath: C:\Users\Natha\Documents\GitHub\SolidStealthGame\SSG
   m_IsLocked: 0
   m_FolderTreeState:
-    scrollPos: {x: 0, y: 79}
-    m_SelectedIDs: dc2d0000
-    m_LastClickedID: 11740
-    m_ExpandedIDs: 00000000202a0000a82a00006a2c0000942d0000f82d0000602e00006c2e0000a630000000ca9a3bffffff7f
+    scrollPos: {x: 0, y: 15}
+    m_SelectedIDs: e42d0000
+    m_LastClickedID: 11748
+    m_ExpandedIDs: 00000000202a0000aa2a0000702c00009c2d0000002e0000682e0000742e0000b230000000ca9a3bffffff7f
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -400,7 +400,7 @@ MonoBehaviour:
     scrollPos: {x: 0, y: 0}
     m_SelectedIDs: 
     m_LastClickedID: 0
-    m_ExpandedIDs: 00000000202a0000a82a00006a2c0000f82d0000a6300000
+    m_ExpandedIDs: 00000000202a0000aa2a0000702c00009c2d0000002e0000682e0000742e0000b2300000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -427,7 +427,7 @@ MonoBehaviour:
   m_ListAreaState:
     m_SelectedInstanceIDs: 
     m_LastClickedInstanceID: 0
-    m_HadKeyboardFocusLastEvent: 1
+    m_HadKeyboardFocusLastEvent: 0
     m_ExpandedInstanceIDs: c62300009eb6000074b60000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
@@ -511,16 +511,16 @@ MonoBehaviour:
   m_DepthBufferBits: 0
   m_Pos:
     serializedVersion: 2
-    x: 8
-    y: 100
-    width: 283
+    x: -32000
+    y: -31951
+    width: 200
     height: 423
   m_PersistentViewDataDictionary: {fileID: 0}
   m_TreeViewState:
     scrollPos: {x: 0, y: 0}
-    m_SelectedIDs: f2e1ffff
-    m_LastClickedID: -7694
-    m_ExpandedIDs: fee1ffff98fbffff00000000a2430000
+    m_SelectedIDs: 
+    m_LastClickedID: 0
+    m_ExpandedIDs: 98fbffff00000000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -565,20 +565,20 @@ MonoBehaviour:
   m_DepthBufferBits: 32
   m_Pos:
     serializedVersion: 2
-    x: 295
+    x: 212
     y: 100
-    width: 954
+    width: 1037
     height: 423
   m_PersistentViewDataDictionary: {fileID: 0}
   m_SceneLighting: 1
-  lastFramingTime: 12686.224230960264
+  lastFramingTime: 306.41217772973823
   m_2DMode: 0
   m_isRotationLocked: 0
   m_AudioPlay: 0
   m_Position:
-    m_Target: {x: 15.469873, y: -129.30777, z: 209.64015}
+    m_Target: {x: 6.7736125, y: 19.400423, z: -21.002645}
     speed: 2
-    m_Value: {x: 15.469873, y: -129.30777, z: 209.64015}
+    m_Value: {x: 6.7736125, y: 19.400423, z: -21.002645}
   m_RenderMode: 0
   m_ValidateTrueMetals: 0
   m_SceneViewState:
@@ -602,13 +602,13 @@ MonoBehaviour:
       speed: 2
       m_Value: 0
   m_Rotation:
-    m_Target: {x: 0.28147706, y: 0.01758232, z: -0.005155746, w: 0.9593931}
+    m_Target: {x: -0.37617016, y: -0.03086986, z: 0.012537589, w: -0.9259514}
     speed: 2
-    m_Value: {x: 0.28147706, y: 0.01758232, z: -0.005155746, w: 0.9593931}
+    m_Value: {x: -0.3761701, y: -0.030869856, z: 0.012537587, w: -0.9259513}
   m_Size:
-    m_Target: 276.00128
+    m_Target: 5.0439467
     speed: 2
-    m_Value: 276.00128
+    m_Value: 5.0439467
   m_Ortho:
     m_Target: 0
     speed: 2
